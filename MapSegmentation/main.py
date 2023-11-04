@@ -40,6 +40,9 @@ def segmentMap(latTop, latBottom, longLeft, longRight, zoom, imgSize, dirName, a
             'longLeft':longLeft,
             'longRight':longRight
         },
+        # These will be useful when we need corner coordinates for any image.
+        "latFactor": latFactor,
+        "longFactor": longFactor,
         "zoom" : zoom,
         "imageSize" : imgSize,
         "imageIndex": {}
@@ -65,7 +68,7 @@ def segmentMap(latTop, latBottom, longLeft, longRight, zoom, imgSize, dirName, a
             yIndex+=1
             
             # ---Logging image and its coordinates into imageDirectory------
-            imageKey = f"{xIndex}_{yIndex}";
+            imageKey = f"{xIndex}-{yIndex}";
             imageDirectory["imageIndex"][imageKey] = {
                 "lat" : currLat,
                 "long": currLong
