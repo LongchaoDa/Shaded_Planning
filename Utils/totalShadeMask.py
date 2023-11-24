@@ -50,7 +50,7 @@ mask_generator = SamAutomaticMaskGenerator(sam)
 # Takes as input a mask and the corresponding original image.
 # Segments out the image, and finds its mean pixel value.
 # Also plots segmentImage and original image.
-def findAverageSegmentColor(mask, image, plot = True):
+def findAverageSegmentColor(mask, image, plot = False):
     if(type(mask) == type({})):
         mask = mask['segmentation'];
     # Convert mask to same dimensions as that of image, i.e., d x d x 3
@@ -83,7 +83,7 @@ def visualizeMaskForThreshold(masks, image):
     for mask in masks:
         pixelMean = findAverageSegmentColor(mask, image, False);
         pixelMeanArr = np.append(pixelMeanArr, pixelMean)
-        print(pixelMean)
+#         print(pixelMean)
     plt.bar(np.arange(len(masks)), pixelMeanArr);
     return pixelMeanArr;
 

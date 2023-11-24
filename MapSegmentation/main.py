@@ -91,8 +91,6 @@ def getImageRadius(lat1, lon1, lat2, lon2):
     return acos(sin(lat1)*sin(lat2)+cos(lat1)*cos(lat2)*cos(lon2-lon1))*6371*1000 ;
 
 
-
-
 # Joins map-segments together
 # This is a generic function, it doesn't assume no. of images, or image size.
 # It just needs the image name format(hard coded), and the directory name.
