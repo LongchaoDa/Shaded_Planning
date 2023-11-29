@@ -81,7 +81,6 @@ def downloadSegmentedMap(latTop, latBottom, longLeft, longRight, zoom, imgSize, 
             print(fileName)
             with open(fileName, 'wb') as file:
                 file.write(response.content)
-            currLong += 2*longFactor
             
             # ---Logging image and its coordinates into imageDirectory------
             imageKey = f"{xIndex}-{yIndex}";
@@ -90,7 +89,7 @@ def downloadSegmentedMap(latTop, latBottom, longLeft, longRight, zoom, imgSize, 
                 "long": currLong
             }
             yIndex+=1
-            
+            currLong += 2*longFactor
             
         currLat -= 2*latFactor
         xIndex+=1   

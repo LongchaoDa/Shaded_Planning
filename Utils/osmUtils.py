@@ -2,6 +2,9 @@ import osm2gmns as og
 import pandas as pd
 
 
+def outputNetToCSV(net):
+    og.outputNetToCSV(net)
+    
 # At the end, saves the link and node csv files.
 def getOsmNodeLinksUsingMapCode(mapCode):
     og.downloadOSMData(mapCode, 'map.osm');
@@ -69,6 +72,20 @@ def getLinkID2EndNodesDict(filePath):
         linkIDToNodePair[linkID] = nodeTuple;
     
     return linkIDToNodePair;
+
+def getNodes2LinkCoordsDict(filePath):
+    links = readLinkCSVFile(filePath);
+    nodes2LinkCoordsDict = {};
+    for link in links:
+        # Will make nodePair key
+        node0 = link[3];
+        node1 = link[4];
+        nodeKey = [node0, node1];
+        nodeKey.sort();
+        nodeKey = tuple(nodeKey);
+        linkCoords = link[12];
+        nodes2LinkCoordsDict[nodeKey] = linkCoords;
+    return nodes2LinkCoordsDict;
 
 
     
