@@ -63,6 +63,8 @@ def findAverageSegmentColor(mask, image, plot = False):
 
     # Average pixel RGB value for the entire segment
     numOfNonZeroElements = np.sum(segmentImage != 0)
+    if(numOfNonZeroElements == 0) :
+        numOfNonZeroElements = 0.00001;
     pixelMean = np.sum(segmentImage) / numOfNonZeroElements;
     
     segmentImage[380:, :] = 0;
@@ -84,7 +86,7 @@ def visualizeMaskForThreshold(masks, image):
         pixelMean = findAverageSegmentColor(mask, image, False);
         pixelMeanArr = np.append(pixelMeanArr, pixelMean)
 #         print(pixelMean)
-    plt.bar(np.arange(len(masks)), pixelMeanArr);
+#     plt.bar(np.arange(len(masks)), pixelMeanArr);
     return pixelMeanArr;
 
 # Takes as input array of mean pixel values for segmentImages, threshold and the original image.
@@ -95,7 +97,7 @@ def combineShadedMasks(pixelMeanArr, image, threshold, masks):
     totalMask = np.full((image.shape[0], image.shape[0]), False)
     for i in shadeSegmentIndex:
         totalMask[masks[i]['segmentation']] = True;
-    findAverageSegmentColor(totalMask, image)
+    findAverageSegmentColor(totalMask, image, False)
     return totalMask
 
 # Main function which returns the mask array

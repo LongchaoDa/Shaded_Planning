@@ -89,13 +89,14 @@ def checkLinkInImage(nodePair, i, j, nodeCoordDict):
     return isLinkInRoad;
 
 
-def calcShadeRatesForRoadsInAllImages(dirPath, nodeFilePath, linkFilePath, threshold = 70):
+def calcShadeRatesForRoadsInAllImages(dirPath, nodeFilePath, linkFilePath, threshold = 70, imageLinksDir = {}):
     totalRoadShadeCoverage = {};
     totalMasks = {};
     totalImage = {};
     
     imgDirPath = os.path.join(dirPath, 'imageDirectory');
-    imageLinksDir = getImageLinksDict(imgDirPath, nodeFilePath, linkFilePath);
+    if(len(imageLinksDir) == 0):
+        imageLinksDir = getImageLinksDict(imgDirPath, nodeFilePath, linkFilePath);
     
     # Useful dicts
     linkIDToNodePair = osmUtils.getLinkID2EndNodesDict(linkFilePath);
@@ -228,11 +229,12 @@ def calcShadeRatesForRoadsInAllImages(dirPath, nodeFilePath, linkFilePath, thres
         
     return (totalRoadShadeCoverage, totalMasks, totalImage);
 
-def generateCompleteImageWithRoads(dirPath, nodeFilePath, linkFilePath):
+def generateCompleteImageWithRoads(dirPath, nodeFilePath, linkFilePath, imageLinksDir = {}):
     totalImage = {};
     
     imgDirPath = os.path.join(dirPath, 'imageDirectory');
-    imageLinksDir = getImageLinksDict(imgDirPath, nodeFilePath, linkFilePath);
+    if(len(imageLinksDir) == 0):
+        imageLinksDir = getImageLinksDict(imgDirPath, nodeFilePath, linkFilePath);
     
     # Useful dicts
     linkIDToNodePair = osmUtils.getLinkID2EndNodesDict(linkFilePath);

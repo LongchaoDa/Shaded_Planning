@@ -8,13 +8,13 @@ def outputNetToCSV(net):
 # At the end, saves the link and node csv files.
 def getOsmNodeLinksUsingMapCode(mapCode):
     og.downloadOSMData(mapCode, 'map.osm');
-    net = og.getNetFromFile(input_file, network_types=('walk'));
+    net = og.getNetFromFile(input_file, network_type='walk');
     og.outputNetToCSV(net)
     return net;
     
 def getOsmNodeLinksUsingExistingMap(fileName):
     input_file = fileName;
-    net = og.getNetFromFile(input_file, network_types=('walk'))
+    net = og.getNetFromFile(input_file, network_type='walk')
     og.outputNetToCSV(net);
     return net;
 

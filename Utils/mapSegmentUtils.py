@@ -8,7 +8,8 @@ import cv2;
 import matplotlib.pyplot as plt
 
 
-apiKey = "AIzaSyBYPwYOvF-GhIF8jBFJ06adOp_2z4wlhyM"
+# apiKey = "AIzaSyBYPwYOvF-GhIF8jBFJ06adOp_2z4wlhyM"
+apiKey = "AIzaSyBjN85kcfQMWOj_NnSHr2w7uU5TE6QyuXY";
 baseUrl = "https://maps.googleapis.com/maps/api/staticmap?"
 
 # latTop = 33.4365
@@ -64,6 +65,7 @@ def downloadSegmentedMap(latTop, latBottom, longLeft, longRight, zoom, imgSize, 
         "imageSize" : imgSize,
         "imageIndex": {}
     };
+    
         
     while(currLat >= latBottom):
         currLong = longLeft
@@ -72,22 +74,26 @@ def downloadSegmentedMap(latTop, latBottom, longLeft, longRight, zoom, imgSize, 
             mapURL = baseUrl + f"center={currLat},{currLong}&zoom={zoom}&size={imgSize}x{imgSize}&maptype={mapType}&key={apiKey}"
             # -----------
             print(mapURL)
-            response = requests.get(mapURL)
             
-            # writing data into the file
-            fileName = os.path.join(dirName, f"img{xIndex}-{yIndex}.png")
-            os.makedirs(dirName, exist_ok=True)
-            # --------
-            print(fileName)
-            with open(fileName, 'wb') as file:
-                file.write(response.content)
-            
+#             response = requests.get(mapURL)
+
+#             # writing data into the file and imageDirectory           
+
+#             fileName = os.path.join(dirName, f"img{xIndex}-{yIndex}.png")
+#             os.makedirs(dirName, exist_ok=True)
+#             # -----Writing into file
+#             print(fileName)
+#             with open(fileName, 'wb') as file:
+#                 file.write(response.content)
+
             # ---Logging image and its coordinates into imageDirectory------
             imageKey = f"{xIndex}-{yIndex}";
             imageDirectory["imageIndex"][imageKey] = {
                 "lat" : currLat,
                 "long": currLong
             }
+                
+                
             yIndex+=1
             currLong += 2*longFactor
             
