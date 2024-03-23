@@ -6,17 +6,16 @@
     <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
     <script type="module" src="./index.js"></script>
 
-    <!-- Bootstrap CSS link -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 
     <style>
         #map {
-            height: 600px; /* Increased map height */
-            margin-bottom: 20px; /* Added space below map */
+            height: 600px;
+            margin-bottom: 20px;
         }
 
         footer {
-            margin-top: 20px; /* Added space above footer */
+            margin-top: 20px;
         }
     </style>
 </head>
@@ -54,13 +53,15 @@
             <div class="col-md-6">
                 <div class="form-group">
                     <label for="sourceInput">Source:</label>
-                    <input type="text" class="form-control" id="sourceInput" value="75001 Paris, France" placeholder="Enter Source">
+                    <input type="text" class="form-control" id="sourceInput" value="75001 Paris, France"
+                        placeholder="Enter Source">
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="form-group">
                     <label for="destinationInput">Destination:</label>
-                    <input type="text" class="form-control" id="destinationInput" value="4 Rue des Petits Champs 75002 Paris, France" placeholder="Enter Destination">
+                    <input type="text" class="form-control" id="destinationInput"
+                        value="4 Rue des Petits Champs 75002 Paris, France" placeholder="Enter Destination">
                 </div>
             </div>
         </div>
@@ -76,7 +77,8 @@
                 <div class="form-group">
                     <label>Travel Mode:</label><br>
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="travelMode" id="drivingMode" value="DRIVING" checked>
+                        <input class="form-check-input" type="radio" name="travelMode" id="drivingMode" value="DRIVING"
+                            checked>
                         <label class="form-check-label" for="drivingMode">Driving</label>
                     </div>
                     <div class="form-check form-check-inline">
@@ -84,7 +86,8 @@
                         <label class="form-check-label" for="walkingMode">Walking</label>
                     </div>
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="travelMode" id="bicyclingMode" value="BICYCLING">
+                        <input class="form-check-input" type="radio" name="travelMode" id="bicyclingMode"
+                            value="BICYCLING">
                         <label class="form-check-label" for="bicyclingMode">Bicycling</label>
                     </div>
                     <div class="form-check form-check-inline">
