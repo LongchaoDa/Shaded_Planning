@@ -1,13 +1,11 @@
-import { getEnvironmentVariable } from './util.js';
+// import { getEnvironmentVariable } from './util.js';
 
-/**
- * @license
- * Copyright 2019 Google LLC. All Rights Reserved.
- * SPDX-License-Identifier: Apache-2.0
- */
 // Initialize and add the map
 let map;
 let directionsRenderers = [];
+
+const colorHues = ['#FF0000', '#FF7F00', '#FFFF00', '#00FF00', '#0000FF', '#4B0082', '#8B00FF', '#FF00FF'];
+const green = '#28A745';
 
 function loadGoogleMaps() {
     (g => {
@@ -24,9 +22,9 @@ function loadGoogleMaps() {
 function clearPreviousRoutes() {
     if (directionsRenderers.length > 0) {
         directionsRenderers.forEach(renderer => {
-            renderer.setMap(null); // Set the map to null to remove the route from the map
+            renderer.setMap(null);
         });
-        directionsRenderers = []; // Clear the array of DirectionsRenderers
+        directionsRenderers = [];
     }
 }
 
@@ -38,7 +36,7 @@ function refreshMap(source, destination, numRoutes, mode) {
         origin: source,
         destination: destination,
         travelMode: google.maps.TravelMode[mode],
-        provideRouteAlternatives: true // Request multiple route alternatives
+        provideRouteAlternatives: true
     };
 
     // Clear previous routes by setting them to null
@@ -89,7 +87,7 @@ function renderRoute(route, result, index, fastestRouteIndex) {
         directions: result,
         routeIndex: index,
         polylineOptions: {
-            strokeColor: index === fastestRouteIndex ? '#28A745' : '#87CEEB', // Dark green for fastest route, light blue for others
+            strokeColor: index === fastestRouteIndex ? green : colorHues[index % colorHues.length],
             strokeWeight: index === fastestRouteIndex ? 8 : 5
         }
     });
@@ -103,7 +101,6 @@ function renderRoute(route, result, index, fastestRouteIndex) {
         showRouteDetails(routeDetails);
     }
 }
-
 
 // Function to create route details
 function createRouteDetails(route) {
@@ -128,8 +125,6 @@ function createRouteDetails(route) {
 
 // Function to show route details on the map
 function showRouteDetails(routeDetails) {
-    // You can add code here to display the route details wherever you want on your HTML page
-    // For example, you can append the routeDetails to a specific div element
     const resultsContainer = document.getElementById('resultsContainer');
     resultsContainer.innerHTML = ''; // Clear previous route details
     resultsContainer.appendChild(routeDetails);
@@ -167,153 +162,18 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function initMap() {
-    // [START maps_add_map_instantiate_map]
-    // The location of Uluru
-    const position = { lat: 33.42365263050725, lng: -111.93938982730594 };
-    // Request needed libraries.
-    //@ts-ignore
+    const position = { lat: 48.8566, lng: 2.3522 }; // Paris
     const { Map } = await google.maps.importLibrary("maps");
-    const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
 
     // The map, centered at Uluru
     map = new Map(document.getElementById("map"), {
         zoom: 16,
         center: position,
-        mapId: "DEMO_MAP_ID",
+        mapId: "MAIN_MAP_ID",
     });
-
-    // [END maps_add_map_instantiate_map]
-    // [START maps_add_map_instantiate_marker]
-    // The marker, positioned at Uluru
-    const marker = new AdvancedMarkerElement({
-        map: map,
-        position: position,
-        title: "Uluru",
-    });
-
-    markLines(map);
-    // [END maps_add_map_instantiate_marker]
 }
-
-function markLines(map) {
-
-
-
-    // Define the coordinates for the path
-    const pathCoords1 = [
-        // { lat: 33.42365263050725, lng: -111.93938982730594 },
-        // { lat: 33.32365263050725, lng: -111.83938982730594 },
-        // { lat: 33.22365263050725, lng: -111.73938982730594 },
-        // { lat: 33.12365263050725, lng: -111.63938982730594 },
-        // { lat: 33.02365263050725, lng: -111.53938982730594 },
-        // { lat: 33.42365263050725, lng: -111.93938982730594 },
-        { lat: 33.42435443897127, lng: -111.93666280025651 },
-        { lat: 33.42200992035623, lng: -111.93665490961563 },
-    ];
-
-    const pathCoords2 = [
-        // { lat: 33.42365263050725, lng: -111.93938982730594 },
-        // { lat: 33.32365263050725, lng: -111.83938982730594 },
-        // { lat: 33.22365263050725, lng: -111.73938982730594 },
-        // { lat: 33.12365263050725, lng: -111.63938982730594 },
-        // { lat: 33.02365263050725, lng: -111.53938982730594 },
-        // { lat: 33.42365263050725, lng: -111.93938982730594 },
-        { lat: 33.4243215107774, lng: -111.93498998439345 },
-        { lat: 33.42202967780008, lng: -111.93496631247086 },
-    ];
-
-    // Construct the polyline
-    const path1 = new google.maps.Polyline({
-        path: pathCoords1,
-        geodesic: true,
-        strokeColor: "#FF0000",
-        strokeOpacity: 0.8,
-        strokeWeight: 4
-    });
-    const path2 = new google.maps.Polyline({
-        path: pathCoords2,
-        geodesic: true,
-        strokeColor: "#FF0000",
-        strokeOpacity: 0.8,
-        strokeWeight: 4
-    });
-
-    // Set the polyline on the map
-    path1.setMap(map);
-    path2.setMap(map);
-}
-// async function getPathBetweenLocations(location1, location2) {
-//     const geocoder = new google.maps.Geocoder();
-//     const geocode1 = await geocodeAddress(location1, geocoder);
-//     if (!geocode1) return null; // Handle error if geocoding fails
-
-//     const geocode2 = await geocodeAddress(location2, geocoder);
-//     if (!geocode2) return null; // Handle error if geocoding fails
-
-//     // Calculate path between the two locations
-//     const path = [
-//         { lat: geocode1.lat, lng: geocode1.lng },
-//         { lat: geocode2.lat, lng: geocode2.lng }
-//     ];
-
-//     return path;
-// }
-
-
-// async function geocodeAddress(address, geocoder) {
-//     return new Promise((resolve, reject) => {
-//         geocoder.geocode({ address: address }, (results, status) => {
-//             if (status === "OK" && results && results.length > 0) {
-//                 const location = results[0].geometry.location;
-//                 resolve({ lat: location.lat(), lng: location.lng() });
-//             } else {
-//                 console.error("Geocode was not successful for the following reason:", status);
-//                 resolve(null);
-//             }
-//         });
-//     });
-// }
-
-// async function getAllPathsBetweenLocations(location1, location2) {
-//     // Initialize Google Maps Directions Service
-//     const directionsService = new google.maps.DirectionsService();
-
-//     // Request directions between location1 and location2
-//     const request = {
-//         origin: location1,
-//         destination: location2,
-//         travelMode: google.maps.TravelMode.DRIVING, 
-//         provideRouteAlternatives: true 
-//     };
-
-//     return new Promise((resolve, reject) => {
-//         directionsService.route(request, (response, status) => {
-//             if (status === "OK") {
-//                 const paths = [];
-//                 response.routes.forEach(route => {
-//                     const path = [];
-//                     route.overview_path.forEach(point => {
-//                         path.push({ lat: point.lat(), lng: point.lng() });
-//                     });
-//                     paths.push(path);
-//                 });
-//                 resolve(paths);
-//             } else {
-//                 console.error("Directions request failed:", status);
-//                 resolve(null);
-//             }
-//         });
-//     });
-// }
 
 window.onload = function () {
     loadGoogleMaps();
     initMap();
-    const location1 = "75001 Paris, France";
-    const location2 = "75006 Paris, France";
-    // getAllPathsBetweenLocations(location1, location2)
-    //     .then(paths => console.log(paths))
-    //     .catch(err => console.error(err));
-
 };
-// [END maps_add_map]
