@@ -9,11 +9,11 @@ const API_KEY = "YOUR_API_KEY";
 
 // Color Map
 const colorDict = {
-    "mostShaded": "#73B576",
+    "shaded": "#73B576",
     "shortest": "#A6D4EA",
-    "halfHalf": "#8AA7BF",
-    "seventyPercentShaded": "#85BF85",
-    "seventyPercentShortest": "#3A548D"
+    "50-50": "#8AA7BF",
+    "70-30": "#85BF85",
+    "30-70": "#3A548D"
 };
 const colorHues = ['#FF0000', '#FF7F00', '#FFFF00', '#00FF00', '#0000FF', '#4B0082', '#8B00FF', '#FF00FF'];
 const green = '#28A745';
@@ -39,14 +39,14 @@ function clearPreviousRoutes() {
     }
 }
 
-function refreshShadedPaths(source, destination, numRoutes, mode) {      
+function refreshShadedPaths(source, destination, numRoutes, mode) {
 
     Promise.all([
         getCoordinates(source),
         getCoordinates(destination)
     ]).then(([coords1, coords2]) => {
-        let newCenter = { lat: coords1[0], lng: coords1[1] }; 
-        map.setCenter(newCenter);
+        let newCenter = { lat: coords1[0], lng: coords1[1] };
+        map.setCenter({ lat: -111.9412691, lng: 33.4243385 }); // -111.9412691,33.4243385
 
         getPaths(coords1, coords2, numRoutes, mode)
             .then(pathsData => {
@@ -55,7 +55,7 @@ function refreshShadedPaths(source, destination, numRoutes, mode) {
             })
             .catch(error => console.error('Error:', error));
     }).catch(error => console.error('Error:', error));
-    
+
 }
 
 // Function to refresh the map and fetch new routes
@@ -187,7 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-async function initMap(position = { lat: 48.8566, lng: 2.3522 }) { // Default is Paris
+async function initMap(position = { lng: -111.9412691, lat: 33.4243385 }) { // Default is Paris -111.9412691,33.4243385
     const { Map } = await google.maps.importLibrary("maps");
 
     // The map, centered at the provided position or default
@@ -197,18 +197,55 @@ async function initMap(position = { lat: 48.8566, lng: 2.3522 }) { // Default is
         mapId: "MAIN_MAP_ID",
     });
 
+
+    // Create the legend and set its style
+    let legend = document.createElement('div');
+    // legend.innerHTML = '';
+    legend.id = 'legend';
+    legend.style.backgroundColor = '#D3D3D3';
+    let legendHTML = '<h3>Legend</h3>';
+    for (let key in colorDict) {
+        legendHTML += '<p style=" font-size: 24px;"><span style="font-size: 24px; background-color:' + colorDict[key] + ';">&nbsp;&nbsp;&nbsp;</span> ' + key + '</p>';
+    }
+    legend.innerHTML = legendHTML;
+
+    // Add the legend to the map
+    map.controls[google.maps.ControlPosition.TOP_RIGHT].push(legend);
+
 }
 
 function renderPaths(pathsData) {
     let bounds = new google.maps.LatLngBounds();
+    let infoWindow = new google.maps.InfoWindow();
+
     pathsData.forEach(pathObj => {
-        const formattedPath = pathObj.path.map(coord => ({ lat: coord[0], lng: coord[1] }));
+        const formattedPath = pathObj.path.map(coord => ({ lat: coord[1], lng: coord[0] }));
         const path = new google.maps.Polyline({
             path: formattedPath,
             geodesic: true,
             strokeColor: colorDict[pathObj.typeOfPath],
             strokeOpacity: 1,
             strokeWeight: 8
+        });
+
+        // Add a listener for the mouseover event
+        path.addListener('mouseover', function (event) {
+            path.setOptions({ strokeWeight: 10 });  // Increase stroke weight
+
+            // Set the content and position of the InfoWindow
+            infoWindow.setContent(`The selected path is ${pathObj.typeOfPath} path.`);
+            infoWindow.setPosition(event.latLng);
+
+            // Open the InfoWindow
+            infoWindow.open(map);
+        });
+
+        // Add a listener for the mouseout event
+        path.addListener('mouseout', function () {
+            path.setOptions({ strokeWeight: 8 });  // Reset stroke weight
+
+            // Close the InfoWindow
+            infoWindow.close();
         });
 
         // Extend the bounds to include each point of the polyline
@@ -230,14 +267,14 @@ window.onload = function () {
 };
 
 async function getPaths(origin, destination, numRoutes, mode) {
-    const response = await fetch(`${API_BASE_URL}/getPaths`, {
+    const response = await fetch(`${API_BASE_URL}/get-path`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-            origin: origin,
-            destination: destination,
+            origin: [33.4243385, -111.9412691],
+            destination: [33.4255037, -111.939287],
             travelMode: google.maps.TravelMode[mode],
             numRoutes: numRoutes
         }),
