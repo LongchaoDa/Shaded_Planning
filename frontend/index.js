@@ -1,9 +1,20 @@
-// import { getEnvironmentVariable } from './util.js';
-
 // Initialize and add the map
 let map;
 let directionsRenderers = [];
 
+// API related constants
+const API_BASE_URL = 'http://localhost:8080';
+const COORD_BASE_URL = "https://maps.googleapis.com/maps/api/geocode/json";
+const API_KEY = "YOUR_API_KEY";
+
+// Color Map
+const colorDict = {
+    "mostShaded": "#73B576",
+    "shortest": "#A6D4EA",
+    "halfHalf": "#8AA7BF",
+    "seventyPercentShaded": "#85BF85",
+    "seventyPercentShortest": "#3A548D"
+};
 const colorHues = ['#FF0000', '#FF7F00', '#FFFF00', '#00FF00', '#0000FF', '#4B0082', '#8B00FF', '#FF00FF'];
 const green = '#28A745';
 
@@ -11,7 +22,7 @@ function loadGoogleMaps() {
     (g => {
         var h, a, k, p = "The Google Maps JavaScript API", c = "google", l = "importLibrary", q = "__ib__", m = document, b = window; b = b[c] || (b[c] = {}); var d = b.maps || (b.maps = {}), r = new Set, e = new URLSearchParams, u = () => h || (h = new Promise(async (f, n) => { await (a = m.createElement("script")); e.set("libraries", [...r] + ""); for (k in g) e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]); e.set("callback", c + ".maps." + q); a.src = `https://maps.${c}apis.com/maps/api/js?` + e; d[q] = f; a.onerror = () => h = n(Error(p + " could not load.")); a.nonce = m.querySelector("script[nonce]")?.nonce || ""; m.head.append(a) })); d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n))
     })({
-        key: "YOUR_API_KEY",
+        key: API_KEY,
         v: "weekly",
         // Use the 'v' parameter to indicate the version to use (weekly, beta, alpha, etc.).
         // Add other bootstrap parameters as needed, using camel case.
@@ -26,6 +37,25 @@ function clearPreviousRoutes() {
         });
         directionsRenderers = [];
     }
+}
+
+function refreshShadedPaths(source, destination, numRoutes, mode) {      
+
+    Promise.all([
+        getCoordinates(source),
+        getCoordinates(destination)
+    ]).then(([coords1, coords2]) => {
+        let newCenter = { lat: coords1[0], lng: coords1[1] }; 
+        map.setCenter(newCenter);
+
+        getPaths(coords1, coords2, numRoutes, mode)
+            .then(pathsData => {
+                // Render the paths on the map
+                renderPaths(pathsData);
+            })
+            .catch(error => console.error('Error:', error));
+    }).catch(error => console.error('Error:', error));
+    
 }
 
 // Function to refresh the map and fetch new routes
@@ -151,29 +181,85 @@ document.addEventListener('DOMContentLoaded', () => {
         const numRoutes = parseInt(document.getElementById('numRoutesInput').value);
         const travelMode = document.querySelector('input[name="travelMode"]:checked').value;
 
-        console.log('Source:', sourceValue);
-        console.log('Destination:', destinationValue);
-        console.log('Number of Routes:', numRoutes);
-        console.log('Travel Mode:', travelMode);
-
         // Refresh the map and fetch new routes based on input values
-        refreshMap(sourceValue, destinationValue, numRoutes, travelMode);
+        // refreshMap(sourceValue, destinationValue, numRoutes, travelMode);
+        refreshShadedPaths(sourceValue, destinationValue, numRoutes, travelMode);
     });
 });
 
-async function initMap() {
-    const position = { lat: 48.8566, lng: 2.3522 }; // Paris
+async function initMap(position = { lat: 48.8566, lng: 2.3522 }) { // Default is Paris
     const { Map } = await google.maps.importLibrary("maps");
 
-    // The map, centered at Uluru
+    // The map, centered at the provided position or default
     map = new Map(document.getElementById("map"), {
         zoom: 16,
         center: position,
         mapId: "MAIN_MAP_ID",
     });
+
+}
+
+function renderPaths(pathsData) {
+    let bounds = new google.maps.LatLngBounds();
+    pathsData.forEach(pathObj => {
+        const formattedPath = pathObj.path.map(coord => ({ lat: coord[0], lng: coord[1] }));
+        const path = new google.maps.Polyline({
+            path: formattedPath,
+            geodesic: true,
+            strokeColor: colorDict[pathObj.typeOfPath],
+            strokeOpacity: 1,
+            strokeWeight: 8
+        });
+
+        // Extend the bounds to include each point of the polyline
+        formattedPath.forEach(point => {
+            bounds.extend(point);
+        });
+
+        // Assuming `map` is your Google Map object
+        path.setMap(map);
+    });
+
+    // Adjust the map's viewport to fit the bounds
+    map.fitBounds(bounds);
 }
 
 window.onload = function () {
     loadGoogleMaps();
     initMap();
 };
+
+async function getPaths(origin, destination, numRoutes, mode) {
+    const response = await fetch(`${API_BASE_URL}/getPaths`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            origin: origin,
+            destination: destination,
+            travelMode: google.maps.TravelMode[mode],
+            numRoutes: numRoutes
+        }),
+    });
+
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data;
+}
+
+async function getCoordinates(address) {
+    let url = `${COORD_BASE_URL}?address=${encodeURIComponent(address)}&key=${API_KEY}`
+    const response = await fetch(url);
+    const data = await response.json();
+    if (data.status === 'OK') {
+        const { lat, lng } = data.results[0].geometry.location;
+        return [lat, lng];
+    } else {
+        throw new Error('Geocoding API request failed');
+    }
+}
+
