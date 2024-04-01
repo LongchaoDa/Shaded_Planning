@@ -15,6 +15,14 @@ const colorDict = {
     "70-30": "#85BF85",
     "30-70": "#3A548D"
 };
+
+const colorDictLegend = {
+    "shaded": "Most Shaded Path",
+    "shortest": "Shortest Path",
+    "50-50": "50% Distance - 50% Shaded Path Ratio",
+    "70-30": "70% Distance - 30% Shaded Path Ratio",
+    "30-70": "30% Distance - 70% Shaded Path Ratio"
+};
 const colorHues = ['#FF0000', '#FF7F00', '#FFFF00', '#00FF00', '#0000FF', '#4B0082', '#8B00FF', '#FF00FF'];
 const green = '#28A745';
 
@@ -36,9 +44,6 @@ function refreshShadedPaths(source, destination, numRoutes, mode) {
         getCoordinates(source),
         getCoordinates(destination)
     ]).then(([coords1, coords2]) => {
-        let newCenter = { lat: coords1[0], lng: coords1[1] };
-        map.setCenter({ lat: -111.9412691, lng: 33.4243385 }); // -111.9412691,33.4243385
-
         getPaths(coords1, coords2, numRoutes, mode)
             .then(pathsData => {
                 // Render the paths on the map
@@ -136,8 +141,8 @@ async function getPaths(origin, destination, numRoutes, mode) {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-            origin: [33.4243385, -111.9412691],
-            destination: [33.4255037, -111.939287],
+            origin: origin,
+            destination: destination,
             travelMode: google.maps.TravelMode[mode],
             numRoutes: numRoutes
         }),
@@ -188,14 +193,14 @@ function createLegend() {
     // Create p elements
     for (let key in colorDict) {
         let p = document.createElement('p');
-        p.style.cssText = 'font-size: 18px; margin: 10px 0; line-height: 1.5em; color: #333;';
+        p.style.cssText = 'font-size: 12px; margin: 10px 0; line-height: 1.5em; color: #333;';
 
         let span = document.createElement('span');
         span.style.cssText = 'display: inline-block; width: 18px; height: 18px; margin-right: 10px; vertical-align: middle; background-color: ' + colorDict[key] + ';';
         span.textContent = '\u00A0\u00A0\u00A0'; // Non-breaking spaces
 
         p.appendChild(span);
-        p.appendChild(document.createTextNode(key));
+        p.appendChild(document.createTextNode(colorDictLegend[key]));
         div.appendChild(p);
     }
 
