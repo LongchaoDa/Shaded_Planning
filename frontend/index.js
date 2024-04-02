@@ -5,15 +5,15 @@ let directionsRenderers = [];
 // API related constants
 const API_BASE_URL = 'http://localhost:8080';
 const COORD_BASE_URL = "https://maps.googleapis.com/maps/api/geocode/json";
-const API_KEY = "YOUR_API_KEY";
+const API_KEY = "key";
 
 // Color Map
 const colorDict = {
-    "shaded": "#73B576",
-    "shortest": "#A6D4EA",
+    "shaded": "#6bb06e",
+    "shortest": "#f18c60",
     "50-50": "#8AA7BF",
-    "70-30": "#85BF85",
-    "30-70": "#3A548D"
+    "70-30": "#d5a698",
+    "30-70": "#c0f3c0"
 };
 
 const colorDictLegend = {
