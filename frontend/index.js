@@ -9,11 +9,11 @@ var API_KEY = null;
 
 // Color Map
 const colorDict = {
-    "shaded": "#73B576",
-    "shortest": "#A6D4EA",
+    "shaded": "#6bb06e",
+    "shortest": "#f18c60",
     "50-50": "#8AA7BF",
-    "70-30": "#85BF85",
-    "30-70": "#3A548D"
+    "70-30": "#d5a698",
+    "30-70": "#c0f3c0"
 };
 
 // Legend Mappings
