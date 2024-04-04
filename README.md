@@ -3,7 +3,11 @@
 ## This is the frontend of the project shaded planning
 
 ## How to run the front-end:
-> ....
+
+Make sure to have a server to host the frontend. For developmet purposes, a http server from the python 3 was used.
+1. RUN the command: python3 -m http.server 3000
+2. Open Chrome and go to URL http://localhost:3000
+3. Enter Google Maps API Key, source and destiantion address, Click on Search
 
 ## How to run the back-end:
 
