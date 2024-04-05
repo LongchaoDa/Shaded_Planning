@@ -1,19 +1,15 @@
 import pickle
-# import sys
-# import json
-# from scipy.spatial import distance
 import os
 from math import radians, cos, sin, sqrt, atan2
-
-pkl_filename = "/Users/rushabh/Documents/Research/Code/ShadingPathServer_Paris/totalRoadShadeCoverage.pkl";
-
-with open(pkl_filename, 'rb') as pkl_file:
-    totalRoadShadeCoverage = pickle.load(pkl_file);
-
-# ----------------------------
+import yaml
 import pandas as pd
 import heapq
-# import matplotlib.pyplot as plt
+
+city_config_file = "../orchestrator/city_config.yaml"
+
+# Load the city configuration
+with open(city_config_file, 'r') as file:
+    city_config = yaml.safe_load(file)
 
 # Step 1: Read CSV files
 def read_csv_files(links_file_path, nodes_file_path):
@@ -81,14 +77,6 @@ def dijkstra(graph, start, end):
     
     return path
 
-
-# def fetch_node_coordinates(nodes_df, path):
-#     # Create a dictionary from nodes_df for quick lookup
-#     node_coords = {row['node_id']: (row['x_coord'], row['y_coord']) for index, row in nodes_df.iterrows()}
-#     # Retrieve the coordinates for each node in the path
-#     path_coords = [node_coords[node_id] for node_id in path]
-#     return path_coords
-
 # Main function adjusted to include percentageCover data
 def calculate(links_file_path, nodes_file_path, start_node, end_node, percentage_cover_data, lengthFactor, shadeFactor):
 
@@ -149,10 +137,36 @@ def find_closest_nodes(nodes_file_path, origin, destination):
     return closest_origin_node_id, closest_destination_node_id
 
 def main(lengthFactor, shadeFactor, origin, destination):
-    links_file_path = '/Users/rushabh/Documents/Research/Code/ShadingPathServer_Paris/link.csv'  
-    nodes_file_path = '/Users/rushabh/Documents/Research/Code/ShadingPathServer_Paris/node.csv'
+
+    city_name = evaluate_city(origin, destination)
+    
+    if city_name is None:
+        return None
+
+    links_file_path = f'../orchestrator/data/{city_name}/link.csv'  
+    nodes_file_path = f'../orchestrator/data/{city_name}/node.csv'
 
     start_node, end_node = find_closest_nodes(nodes_file_path, origin, destination)
+    
+    pkl_filename = f'../orchestrator/data/{city_name}/total_road_shade_coverage.pkl'
+    with open(pkl_filename, 'rb') as pkl_file:
+        totalRoadShadeCoverage = pickle.load(pkl_file)
 
     return calculate(links_file_path, nodes_file_path, start_node, end_node, totalRoadShadeCoverage, lengthFactor, shadeFactor)
 
+def evaluate_city(origin, destination):
+    # Extract the city bounds
+    for city_name in city_config['city_bounds']:
+        lat_top = city_config['city_bounds'][city_name]['lat_top']
+        lat_bottom = city_config['city_bounds'][city_name]['lat_bottom']
+        lng_left = city_config['city_bounds'][city_name]['lng_left']
+        lng_right = city_config['city_bounds'][city_name]['lng_right']
+
+        origin_lat, origin_lng = origin
+        destination_lat, destination_lng = destination
+
+        if (lat_bottom <= origin_lat <= lat_top and lng_left <= origin_lng <= lng_right) and \
+           (lat_bottom <= destination_lat <= lat_top and lng_left <= destination_lng <= lng_right):
+            return city_name
+
+    return None

@@ -12,7 +12,7 @@ app.post('/get-path', (req, res) => {
     const { origin, destination } = req.body;
 
     // Assuming the corrected script path
-    const scriptPath = '/Users/rushabh/Documents/Research/Code/ShadingPathServer_Paris/ShadeCombination.py';
+    const scriptPath = '../orchestrator/shade_combination.py';
 
     // Prepare arguments to pass to the Python script
     // Ensure to convert the coordinates into a format that your Python script expects

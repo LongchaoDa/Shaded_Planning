@@ -1,5 +1,5 @@
 import json
-from backend.orchestrator.dijkstra_shade import main
+from dijkstra_shade import main
 import sys
 
 if __name__ == "__main__":
