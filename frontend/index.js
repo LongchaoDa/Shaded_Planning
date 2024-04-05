@@ -33,7 +33,12 @@ var markerData = [];
 const startMarkerIcon = "http://maps.google.com/mapfiles/ms/icons/green-dot.png";
 const stopMarkerIcon = "http://maps.google.com/mapfiles/ms/icons/red-dot.png";
 
-// Load the Google Maps JavaScript API
+
+window.callbackFunction = function () {
+    window.google.maps.__ib__();
+    window.initAutocomplete();
+}
+
 function loadGoogleMaps() {
     // Load the Google Maps JavaScript API    
     (g => {
@@ -51,17 +56,18 @@ function loadGoogleMaps() {
                 await (a = m.createElement("script"));
                 e.set("libraries", [...r] + "");
                 for (k in g) e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]);
-                e.set("callback", c + ".maps." + q);
+                e.set("callback", "callbackFunction");
                 a.src = `https://maps.${c}apis.com/maps/api/js?` + e;
                 d[q] = f;
                 a.onerror = () => h = n(Error(p + " could not load."));
                 a.nonce = m.querySelector("script[nonce]")?.nonce || "";
-                m.head.append(a)
+                m.head.append(a);
             }));
         d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n))
     })({
         key: API_KEY,
         v: "weekly",
+        libraries: "places",
         // Use the 'v' parameter to indicate the version to use (weekly, beta, alpha, etc.).
         // Add other bootstrap parameters as needed, using camel case.
     });
@@ -111,7 +117,7 @@ function refreshShadedPaths(source, destination, travelMode, numRoutes) {
 document.addEventListener('DOMContentLoaded', () => {
     mask = document.getElementById('mask');
     spinner = document.getElementById('loadingSpinner');
-    document.getElementById('apiKey').addEventListener('input', function() {
+    document.getElementById('apiKey').addEventListener('input', function () {
         API_KEY = this.value;
         validateKey();
     });
@@ -135,7 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
         spinner.style.display = 'none';
     });
 
-    document.getElementById('numRoutesInput').addEventListener('input', function(e) {
+    document.getElementById('numRoutesInput').addEventListener('input', function (e) {
         var value = parseInt(e.target.value);
         if (value < 1) {
             e.target.value = 1;
@@ -155,33 +161,10 @@ function validateKey() {
             } else {
                 loadGoogleMaps();
                 initMap();
-                // laodMapsLibrary();
                 mask.style.display = 'none';
             }
         })
         .catch(error => console.error('Error:', error));
-}
-
-async function laodMapsLibrary() {
-
-    // Remove the old script if it exists
-    var oldScript = document.getElementById('google-maps-script');
-    if (oldScript) {
-        return;
-    }
-
-    // Create a new script element
-    var script = document.createElement('script');
-    script.id = 'google-maps-script';
-
-    // Set the src attribute to the Google Maps JavaScript API URL
-    script.src = 'https://maps.googleapis.com/maps/api/js?key=' + API_KEY + '&libraries=places';
-
-    // Append the script element to the head of the document
-    document.head.appendChild(script);
-
-    // Call the function when the page has correct api key
-    window.addEventListener('load', initAutocomplete);
 }
 
 async function initMap(position = {
@@ -282,7 +265,7 @@ function renderPaths(pathsData) {
         polylineData.push(path);
 
         // Add a listener for the mouseover event
-        path.addListener('mouseover', function(event) {
+        path.addListener('mouseover', function (event) {
             path.setOptions({
                 strokeWeight: 12
             }); // Increase stroke weight
@@ -300,7 +283,7 @@ function renderPaths(pathsData) {
         });
 
         // Add a listener for the mouseout event
-        path.addListener('mouseout', function() {
+        path.addListener('mouseout', function () {
             path.setOptions({
                 strokeWeight: 8
             }); // Reset stroke weight
@@ -403,12 +386,9 @@ function createLegend() {
     map.controls[google.maps.ControlPosition.TOP_RIGHT].push(div);
 }
 
-function initAutocomplete() {
+window.initAutocomplete = function () {
     var sourceInput = document.getElementById('sourceInput');
     var sourceAutocomplete = new google.maps.places.Autocomplete(sourceInput);
     var destinationInput = document.getElementById('destinationInput');
     var destinationAutocomplete = new google.maps.places.Autocomplete(destinationInput);
 }
-
-// Call the function when the page has finished loading
-// google.maps.event.addDomListener(window, 'load', initAutocomplete);
