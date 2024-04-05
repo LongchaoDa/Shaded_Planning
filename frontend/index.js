@@ -97,7 +97,6 @@ function refreshShadedPaths(source, destination, travelMode, numRoutes) {
             })
             .catch(error => {
                 console.error('Error:', error);
-
                 // Hide the spinner
                 spinner.style.display = 'none';
             });
@@ -234,12 +233,16 @@ function renderPaths(pathsData) {
     let bounds = new google.maps.LatLngBounds();
     let infoWindow = new google.maps.InfoWindow();
 
-    if (!pathsData || pathsData.length === 0) {
-        alert('Wrong input location or no valid path found.');
+    // Filter out the elements with null paths
+    let validPathsData = pathsData.filter(op => op.path !== null && op.path.length > 1);
+
+    // If all paths were null and When no path is found because of city bounds
+    if (validPathsData.length === 0 || !validPathsData) {
+        alert('Please specify the locations more precisely. Currently, a valid path between the source and destination cannot be found.');
         return;
     }
 
-    let op = pathsData[0];
+    let op = validPathsData[0];
     markStartAndStop(map, {
         lat: op.path[0][1],
         lng: op.path[0][0]
@@ -250,7 +253,7 @@ function renderPaths(pathsData) {
     polylineData = [];
 
 
-    pathsData.forEach(pathObj => {
+    validPathsData.forEach(pathObj => {
         const formattedPath = pathObj.path.map(coord => ({
             lat: coord[1],
             lng: coord[0]
