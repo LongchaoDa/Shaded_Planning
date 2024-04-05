@@ -68,7 +68,7 @@ function loadGoogleMaps() {
 }
 
 // Refresh the shaded paths on the map
-function refreshShadedPaths(source, destination, travelMode) {
+function refreshShadedPaths(source, destination, travelMode, numRoutes) {
     removeLegend();
 
     // Show the spinner
@@ -80,7 +80,7 @@ function refreshShadedPaths(source, destination, travelMode) {
         getCoordinates(source),
         getCoordinates(destination)
     ]).then(([coords1, coords2]) => {
-        getPaths(coords1, coords2, travelMode)
+        getPaths(coords1, coords2, travelMode, numRoutes)
             .then(pathsData => {
                 // Hide the spinner
                 mask.style.display = 'none';
@@ -98,7 +98,7 @@ function refreshShadedPaths(source, destination, travelMode) {
 
     }).catch(error => {
         console.error('Error:', error);
-        alert('Please enter a more specific location, no valid path found.');
+        alert('Please enter a valid Google Maps API key or specify the locations more precisely. Currently, a valid path between the source and destination cannot be found.');
 
         // Hide the spinner
         spinner.style.display = 'none';
@@ -121,10 +121,29 @@ document.addEventListener('DOMContentLoaded', () => {
         let sourceValue = document.getElementById('sourceInput').value;
         let destinationValue = document.getElementById('destinationInput').value;
         let travelMode = document.querySelector('input[name="travelMode"]:checked').value;
+        const numRoutes = parseInt(document.getElementById('numRoutesInput').value);
 
         // Refresh the map and fetch new routes based on input values
-        refreshShadedPaths(sourceValue, destinationValue, travelMode);
+        refreshShadedPaths(sourceValue, destinationValue, travelMode, numRoutes);
     });
+
+    const resetButton = document.getElementById('resetButton');
+    resetButton.addEventListener('click', () => {
+        removeLegend();
+        removeExistingPaths();
+        mask.style.display = 'none';
+        spinner.style.display = 'none';
+    });
+
+    document.getElementById('numRoutesInput').addEventListener('input', function(e) {
+        var value = parseInt(e.target.value);
+        if (value < 1) {
+            e.target.value = 1;
+        } else if (value > 5) {
+            e.target.value = 5;
+        }
+    });
+
 });
 
 function validateKey() {
@@ -136,10 +155,33 @@ function validateKey() {
             } else {
                 loadGoogleMaps();
                 initMap();
+                // laodMapsLibrary();
                 mask.style.display = 'none';
             }
         })
         .catch(error => console.error('Error:', error));
+}
+
+async function laodMapsLibrary() {
+
+    // Remove the old script if it exists
+    var oldScript = document.getElementById('google-maps-script');
+    if (oldScript) {
+        return;
+    }
+
+    // Create a new script element
+    var script = document.createElement('script');
+    script.id = 'google-maps-script';
+
+    // Set the src attribute to the Google Maps JavaScript API URL
+    script.src = 'https://maps.googleapis.com/maps/api/js?key=' + API_KEY + '&libraries=places';
+
+    // Append the script element to the head of the document
+    document.head.appendChild(script);
+
+    // Call the function when the page has correct api key
+    window.addEventListener('load', initAutocomplete);
 }
 
 async function initMap(position = {
@@ -208,7 +250,6 @@ function removeExistingPaths() {
 function renderPaths(pathsData) {
     let bounds = new google.maps.LatLngBounds();
     let infoWindow = new google.maps.InfoWindow();
-
 
     if (!pathsData || pathsData.length === 0) {
         alert('Wrong input location or no valid path found.');
@@ -282,7 +323,7 @@ function renderPaths(pathsData) {
 }
 
 // Fetch the paths from the backend API
-async function getPaths(origin, destination, travelMode) {
+async function getPaths(origin, destination, travelMode, numRoutes) {
     const response = await fetch(`${API_BASE_URL}/get-path`, {
         method: 'POST',
         headers: {
@@ -291,7 +332,8 @@ async function getPaths(origin, destination, travelMode) {
         body: JSON.stringify({
             origin: origin,
             destination: destination,
-            travelMode: travelMode
+            travelMode: travelMode,
+            numRoutes: numRoutes
         }),
     });
 
@@ -340,7 +382,7 @@ function createLegend() {
     // Create h3
     let h3 = document.createElement('h3');
     h3.style.cssText = 'margin-top: 0; font-size: 12px; color: #333;';
-    h3.textContent = 'Legend for Paths:';
+    h3.textContent = 'Color coding for paths:';
     div.appendChild(h3);
 
     // Create p elements
@@ -360,3 +402,13 @@ function createLegend() {
     // Add the legend to the map
     map.controls[google.maps.ControlPosition.TOP_RIGHT].push(div);
 }
+
+function initAutocomplete() {
+    var sourceInput = document.getElementById('sourceInput');
+    var sourceAutocomplete = new google.maps.places.Autocomplete(sourceInput);
+    var destinationInput = document.getElementById('destinationInput');
+    var destinationAutocomplete = new google.maps.places.Autocomplete(destinationInput);
+}
+
+// Call the function when the page has finished loading
+// google.maps.event.addDomListener(window, 'load', initAutocomplete);
