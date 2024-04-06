@@ -78,9 +78,9 @@ def dijkstra(graph, start, end):
     return path
 
 # Main function adjusted to include percentageCover data
-def calculate(links_file_path, nodes_file_path, start_node, end_node, percentage_cover_data, lengthFactor, shadeFactor):
+def calculate(links_file_path, nodes_file_path, start_node, end_node, percentage_cover_data, lengthFactor, shadeFactor, cityName):
 
-    path = f'graph_{lengthFactor}_{shadeFactor}.pkl'
+    path = f'../orchestrator/graphData/{cityName}/graph_{lengthFactor}_{shadeFactor}.pkl'
     # Check if variables already present.
     if os.path.exists(path):
         with open(path, 'rb') as f:
@@ -152,7 +152,7 @@ def main(lengthFactor, shadeFactor, origin, destination):
     with open(pkl_filename, 'rb') as pkl_file:
         totalRoadShadeCoverage = pickle.load(pkl_file)
 
-    return calculate(links_file_path, nodes_file_path, start_node, end_node, totalRoadShadeCoverage, lengthFactor, shadeFactor)
+    return calculate(links_file_path, nodes_file_path, start_node, end_node, totalRoadShadeCoverage, lengthFactor, shadeFactor, city_name)
 
 def evaluate_city(origin, destination):
     # Extract the city bounds
