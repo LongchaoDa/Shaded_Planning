@@ -1,0 +1,64 @@
+.container-fluid {
+    padding-left: 5%;
+    padding-right: 5%;
+}
+
+#map {
+    height: 700px;
+    margin-bottom: 20px;
+}
+
+footer {
+    margin-top: 20px;
+}
+
+#loadingSpinner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+}
+
+#mask {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    background-color: rgba(135, 206, 235, 0.5);
+}
+
+#buttonContainer {
+    display: flex;
+    justify-content: center;
+}
+
+.btn {
+    margin-right: 10px;
+}
+
+.btn-reset {
+    background-color: #d3d3d3;
+}
+
+.travel-mode-label {
+    margin-bottom: 15px;
+}
+
+#buttonContainer .btn {
+    width: 150px;
+}
+
+#loadingSpinner .spinner-border {
+    width: 3rem;
+    height: 3rem;
+}
+
+#loadingSpinner div:last-child {
+    color: black;
+    font-size: 2rem;
+}
+
+.hint-label {
+    margin-top: 15px;
+}

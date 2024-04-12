@@ -1,0 +1,17 @@
+city_bounds:
+    paris:
+        lat_top: 48.8857
+        lat_bottom: 48.8309
+        lng_left: 2.3027
+        lng_right: 2.3919
+    byeng:
+        lat_top: 33.42548
+        lat_bottom: 33.422
+        lng_left: -111.94126
+        lng_right: -111.93666
+    tempe:
+        lat_top: 33.4365
+        lat_bottom: 33.32759
+        lng_left: -111.9784
+        lng_right: -111.89361
+    
