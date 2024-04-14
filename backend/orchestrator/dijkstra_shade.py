@@ -78,22 +78,9 @@ def dijkstra(graph, start, end):
     return path
 
 # Main function adjusted to include percentageCover data
-def calculate(links_file_path, nodes_file_path, start_node, end_node, percentage_cover_data, lengthFactor, shadeFactor, cityName):
-
-    path = f'../orchestrator/graphData/{cityName}/graph_{lengthFactor}_{shadeFactor}.pkl'
-    # Check if variables already present.
-    if os.path.exists(path):
-        with open(path, 'rb') as f:
-            graph = pickle.load(f);
-            
-    else:
-        links_df, nodes_df = read_csv_files(links_file_path, nodes_file_path)
-        graph = build_graph(links_df, nodes_df, percentage_cover_data, lengthFactor, shadeFactor)
-        with open(path, 'wb') as f:
-            pickle.dump((graph), f)
+def calculate(graph, start_node, end_node):
 
     shortest_path = dijkstra(graph, start_node, end_node)
-    # path_coords = fetch_node_coordinates(nodes_df, shortest_path)
     
     return (shortest_path)
 
@@ -118,41 +105,25 @@ def haversine(coord1, coord2):
     
     return distance
 
-def find_closest_nodes(nodes_file_path, origin, destination):
-    nodes_df = pd.read_csv(nodes_file_path)
-    
-    # Calculate Haversine distance from each node to the origin and destination
-    origin_distances = nodes_df.apply(lambda row: haversine(origin, (row['y_coord'], row['x_coord'])), axis=1)
-    destination_distances = nodes_df.apply(lambda row: haversine(destination, (row['y_coord'], row['x_coord'])), axis=1)
-    
-    # Find the index of the node with the smallest distance to origin and destination
-    closest_origin_node_idx = origin_distances.idxmin()
-    closest_destination_node_idx = destination_distances.idxmin()
-    
-    # Retrieve the node_id for the closest nodes
-    closest_origin_node_id = nodes_df.iloc[closest_origin_node_idx]['node_id']
-    closest_destination_node_id = nodes_df.iloc[closest_destination_node_idx]['node_id']
-    
-    # print(closest_origin_node_id, closest_destination_node_id)
-    return closest_origin_node_id, closest_destination_node_id
+def find_closest_nodes_using_graph(target_coords, graph) :
+    # Traverse each node, calculate distance to the target coordinates, ignore nodes with empty edges, and find the nearest node
+    nearest_node_with_edges = 123
+    min_distance_with_edges = float('inf')  # Initialize with infinity
 
-def main(lengthFactor, shadeFactor, origin, destination):
-
-    city_name = evaluate_city(origin, destination)
-    
-    if city_name is None:
-        return None
-
-    links_file_path = f'../orchestrator/data/{city_name}/link.csv'  
-    nodes_file_path = f'../orchestrator/data/{city_name}/node.csv'
-
-    start_node, end_node = find_closest_nodes(nodes_file_path, origin, destination)
-    
-    pkl_filename = f'../orchestrator/data/{city_name}/total_road_shade_coverage.pkl'
-    with open(pkl_filename, 'rb') as pkl_file:
-        totalRoadShadeCoverage = pickle.load(pkl_file)
-
-    return calculate(links_file_path, nodes_file_path, start_node, end_node, totalRoadShadeCoverage, lengthFactor, shadeFactor, city_name)
+    for node, data in graph.items():
+        # Skip nodes with empty 'edges' list
+        if not data['edges']:
+            continue
+        
+        node_coords = data['coords']
+        long, lat = node_coords
+        node_coords = (lat, long)
+        distance = haversine(node_coords, target_coords)
+        if distance < min_distance_with_edges:
+            min_distance_with_edges = distance
+            nearest_node_with_edges = node
+            # print(nearest_node_with_edges)
+    return nearest_node_with_edges
 
 def evaluate_city(origin, destination):
     # Extract the city bounds
@@ -170,3 +141,38 @@ def evaluate_city(origin, destination):
             return city_name
 
     return None
+
+def main(lengthFactor, shadeFactor, origin, destination, travelMode):
+
+    if(travelMode == "WALKING"):
+        travelMode = "walkable";
+    elif(travelMode == "BICYCLING"):
+        travelMode = "bikeable";
+
+    city_name = evaluate_city(origin, destination)
+    
+    if city_name is None:
+        return None
+
+    path = f'../orchestrator/graphData_{travelMode}/{city_name}/graph_{lengthFactor}_{shadeFactor}.pkl'
+    # Check if variables already present.
+    try:
+        with open(path, 'rb') as f:
+            graph = pickle.load(f);
+    except:
+        print('Relevant graph not created. Create graph first before running server.')
+
+    start_node = find_closest_nodes_using_graph(origin, graph)
+    end_node = find_closest_nodes_using_graph(destination, graph)
+
+    print(graph[start_node])
+    print(graph[end_node])
+
+    print(start_node, end_node)
+    return calculate(graph, start_node, end_node)
+
+
+origin = (33.4235981, -111.9395366);
+destination = (33.4199905, -111.9306869)
+
+print(main(1, 1, origin, destination));

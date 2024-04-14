@@ -9,14 +9,14 @@ app.use(cors());
 app.use(express.json()); // Middleware to parse JSON bodies
 
 app.post('/get-path', (req, res) => {
-    const { origin, destination } = req.body;
+    const { origin, destination, travelMode } = req.body;
 
     // Assuming the corrected script path
     const scriptPath = '../orchestrator/shade_combination.py';
 
     // Prepare arguments to pass to the Python script
     // Ensure to convert the coordinates into a format that your Python script expects
-    const args = [origin.join(','), destination.join(',')];
+    const args = [origin.join(','), destination.join(','), travelMode.join(',')];
 
     execFile('python3', [scriptPath, ...args], (error, stdout, stderr) => {
         if (error) {

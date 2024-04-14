@@ -64,19 +64,19 @@ with open(city_config_file, 'r') as file:
 # Looping over the city names, and creating graphs.
 for city_name in city_config['city_bounds']:
     print("\nCreating graphs for ", city_name, '-------------');
-    pkl_filename = f'data/{city_name}/total_road_shade_coverage.pkl'
+    pkl_filename = f'data_walkable/{city_name}/total_road_shade_coverage.pkl'
     with open(pkl_filename, 'rb') as pkl_file:
         totalRoadShadeCoverage = pickle.load(pkl_file)
 
-    links_file_path = f'data/{city_name}/link.csv'  
-    nodes_file_path = f'data/{city_name}/node.csv'
+    links_file_path = f'data_walkable/{city_name}/link.csv'  
+    nodes_file_path = f'data_walkable/{city_name}/node.csv'
 
     total_factors = len(dijkstraFactors)
     factor_count = 0  # Initialize a counter to track progress through the factors
 
     for factor in dijkstraFactors:
-        directory_path = f'graphData/{city_name}'
-        path = f'graphData/{city_name}/graph_{factor[0]}_{factor[1]}.pkl'
+        directory_path = f'graphData_walkable/{city_name}'
+        path = f'graphData_walkable/{city_name}/graph_{factor[0]}_{factor[1]}.pkl'
 
         # Ensure the directory exists, if not create it
         os.makedirs(directory_path, exist_ok=True)
