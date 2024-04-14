@@ -58,3 +58,7 @@ footer {
     color: black;
     font-size: 2rem;
 }
+
+.hint-label {
+    margin-top: 15px;
+}

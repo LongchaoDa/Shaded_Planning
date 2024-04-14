@@ -93,7 +93,7 @@ function refreshShadedPaths(source, destination, travelMode, numRoutes) {
                 spinner.style.display = 'none';
                 // Render the paths on the map
                 renderPaths(pathsData);
-                createLegend();
+                createLegend(pathsData);
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -358,7 +358,7 @@ function removeLegend() {
 }
 
 // Create the legend and add it to the map
-function createLegend() {
+function createLegend(pathsData) {
 
     // Create main div
     let div = document.createElement('div');
@@ -371,19 +371,38 @@ function createLegend() {
     h3.textContent = 'Color coding for paths:';
     div.appendChild(h3);
 
-    // Create p elements
-    for (let key in colorDict) {
+    // Create legend for start marker
+    let startLegend = document.createElement('div');
+    startLegend.innerHTML = '<img src="' + startMarkerIcon + '" height="20" width="20"> Start';
+    startLegend.style.marginBottom = '10px'; // Add some space below the start legend
+    div.appendChild(startLegend);
+
+    // Create legend for stop marker
+    let stopLegend = document.createElement('div');
+    stopLegend.innerHTML = '<img src="' + stopMarkerIcon + '" height="20" width="20"> Stop';
+    stopLegend.style.marginBottom = '10px'; // Add some space below the stop legend
+    div.appendChild(stopLegend);
+
+    // Filter out the elements with null paths
+    let validPathsData = pathsData.filter(op => op.path !== null && op.path.length > 1);
+
+    // If all paths were null and When no path is found because of city bounds
+    if (validPathsData.length === 0 || !validPathsData) {
+        return;
+    }
+    
+    validPathsData.forEach(pathObj => {
         let p = document.createElement('p');
         p.style.cssText = 'font-size: 12px; margin: 10px 0; line-height: 1.5em; color: #333;';
 
         let span = document.createElement('span');
-        span.style.cssText = 'display: inline-block; width: 12px; height: 12px; margin-right: 10px; vertical-align: middle; background-color: ' + colorDict[key] + ';';
+        span.style.cssText = 'display: inline-block; width: 12px; height: 12px; margin-right: 10px; vertical-align: middle; background-color: ' + colorDict[pathObj.typeOfPath] + ';';
         span.textContent = '\u00A0\u00A0\u00A0'; // Non-breaking spaces
 
         p.appendChild(span);
-        p.appendChild(document.createTextNode(colorDictLegend[key]));
+        p.appendChild(document.createTextNode(colorDictLegend[pathObj.typeOfPath]));
         div.appendChild(p);
-    }
+    });
 
     // Add the legend to the map
     map.controls[google.maps.ControlPosition.TOP_RIGHT].push(div);
