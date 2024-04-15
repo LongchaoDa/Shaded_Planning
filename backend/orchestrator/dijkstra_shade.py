@@ -19,11 +19,9 @@ def read_csv_files(links_file_path, nodes_file_path):
 
 # Modified Step 2: Build the graph including percentageCover in the weight
 def build_graph(links_df, nodes_df, percentage_cover_data, lengthFactor=1, shadeFactor=1):
-
     node_coords = {row['node_id']: (row['x_coord'], row['y_coord']) for index, row in nodes_df.iterrows()}
     graph = {node_id: {'coords': node_coords[node_id], 'edges': []} for node_id in node_coords}
-    
-    # Populate the graph with edges from the links data
+
     for index, row in links_df.iterrows():
         from_node, to_node, length = row['from_node_id'], row['to_node_id'], row['length']
         link_id = row['link_id']
@@ -31,58 +29,60 @@ def build_graph(links_df, nodes_df, percentage_cover_data, lengthFactor=1, shade
         percentage_cover = percentage_cover_data.get(link_id, {}).get('percentageCover', 0)
         weight = lengthFactor * length + shadeFactor * percentage_cover
         
-        # graph[from_node]['edges'].append((to_node, weight))
-
-        # Check if the edge already exists to maintain uniqueness
-        # This is required as link.csv has link duplicates, swapping the from and to nodes each time.
-
-        edge = (to_node, weight)
+        # Each edge is stored with (neighbor_node, weight, original_length)
+        edge = (to_node, weight, length)
         if edge not in graph[from_node]['edges']:
             graph[from_node]['edges'].append(edge)
 
-        # Doing it for the other way around as well, because link.csv doesn't ensure that always.
-        edge = (from_node, weight)
+        edge = (from_node, weight, length)
         if edge not in graph[to_node]['edges']:
             graph[to_node]['edges'].append(edge)
     
     return graph
 
 
+import heapq
+
 def dijkstra(graph, start, end):
-    
-    queue = [(0, start)]
+    queue = [(0, start, 0)]  # (current_distance, current_node, path_length)
     
     distances = {node: float('infinity') for node in graph}
     distances[start] = 0
 
     prev = {node: None for node in graph}
-        
+    path_lengths = {node: 0 for node in graph}  # To store the path length
+
     while queue:
-        current_distance, current_node = heapq.heappop(queue)
+        current_distance, current_node, current_path_length = heapq.heappop(queue)
+        
         if current_node == end:
             break
-        # Adjusted to access the 'edges' within each node's dictionary
-        for neighbor, weight in graph[current_node]['edges']:
+
+        for neighbor, weight, original_length in graph[current_node]['edges']:
             distance = current_distance + weight
+            path_length = current_path_length + original_length
             if distance < distances[neighbor]:
                 distances[neighbor] = distance
+                path_lengths[neighbor] = path_length
                 prev[neighbor] = current_node
-                heapq.heappush(queue, (distance, neighbor))
-    
+                heapq.heappush(queue, (distance, neighbor, path_length))
+
     path = []
+    path_length = path_lengths[end]  # Total length of the path
     while end is not None:
         path.append(graph[end]['coords'])
         end = prev[end]
     path.reverse()
     
-    return path
+    return path, path_length
+
 
 # Main function adjusted to include percentageCover data
 def calculate(graph, start_node, end_node):
 
-    shortest_path = dijkstra(graph, start_node, end_node)
+    shortest_path, path_length = dijkstra(graph, start_node, end_node)
     
-    return (shortest_path)
+    return (shortest_path, path_length)
 
 def haversine(coord1, coord2):
     """
@@ -165,14 +165,14 @@ def main(lengthFactor, shadeFactor, origin, destination, travelMode):
     start_node = find_closest_nodes_using_graph(origin, graph)
     end_node = find_closest_nodes_using_graph(destination, graph)
 
-    print(graph[start_node])
-    print(graph[end_node])
+    # Find the path using Dijkstra's algorithm
+    path, total_length = calculate(graph, start_node, end_node)
+    
+    return {"path": path, "length": total_length}
 
-    print(start_node, end_node)
-    return calculate(graph, start_node, end_node)
+# Testing
 
+# origin = (48.882210, 2.328871);
+# destination = (48.8823998,2.3236082)
 
-origin = (33.4235981, -111.9395366);
-destination = (33.4199905, -111.9306869)
-
-print(main(1, 1, origin, destination));
+# print(main(1, 0, origin, destination, 'WALKING'));

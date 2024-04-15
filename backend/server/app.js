@@ -15,8 +15,7 @@ app.post('/get-path', (req, res) => {
     const scriptPath = '../orchestrator/shade_combination.py';
 
     // Prepare arguments to pass to the Python script
-    // Ensure to convert the coordinates into a format that your Python script expects
-    const args = [origin.join(','), destination.join(','), travelMode.join(',')];
+    const args = [origin.join(','), destination.join(','), travelMode];
 
     execFile('python3', [scriptPath, ...args], (error, stdout, stderr) => {
         if (error) {
@@ -26,10 +25,12 @@ app.post('/get-path', (req, res) => {
 
         try {
             // Parse the JSON output from the Python script
+            console.log(stdout)
             const pathsObject = JSON.parse(stdout);
-            const response = Object.entries(pathsObject).map(([typeOfPath, path]) => ({
+            const response = Object.entries(pathsObject).map(([typeOfPath, data]) => ({
                 typeOfPath: typeOfPath.toLowerCase(), // Convert "Shortest" to "shortest", etc.
-                path // Assuming this is already a list of lists of coordinates
+                path: data.path, // This is a list of lists of coordinates
+                length: data.length // Total length of the path
             }));
 
             // Send the structured response
@@ -40,6 +41,7 @@ app.post('/get-path', (req, res) => {
         }
     });
 });
+
 
 
 app.listen(port, () => {
