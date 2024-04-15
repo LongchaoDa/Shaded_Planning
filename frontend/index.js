@@ -275,9 +275,11 @@ function renderPaths(pathsData) {
 
             // Set the content and position of the InfoWindow
             infoWindow.setContent(`
-            <div style="font-family: Arial, sans-serif; margin: 10px;">
-                <p style="margin-bottom: 0; font-size: 1rem;">The selected path is <strong>${colorDictLegend[pathObj.typeOfPath]}</strong>.</p>
-            </div>
+                <div style="font-family: Arial, sans-serif; margin: 10px;">
+                    <p style="margin-bottom: 0; font-size: 1rem;">The selected path is <strong style="font-weight: bold;">${colorDictLegend[pathObj.typeOfPath]}</strong>
+                    .</p>
+                    <p style="margin-bottom: 0; font-size: 1rem;">Total distance is <strong style="font-weight: bold;">${(pathObj.length).toFixed(2)} metres</strong>.</p>
+                </div>
             `);
             infoWindow.setPosition(event.latLng);
 
