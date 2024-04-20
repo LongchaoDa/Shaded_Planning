@@ -10,7 +10,11 @@ The project is deploy online:
 
 http://18.191.152.144:9999/tutorial.html
 
+The overview of the designed pipline is shown here:
 
+![overview](./assets/overview.png)
+The detailed pipeline includes three components: Shade Ratio Derivation, Multi-
+layer Road Graph Construction, and Route Planning Interface.
 
 ## How to run the front-end:
 
