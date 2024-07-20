@@ -50,3 +50,6 @@ Then, you should have the following adjustment:
 
     [Demo Video](https://drive.google.com/drive/folders/1BvR0i0eImDb86HXiGS4hGRoFKa71DAnJ?usp=sharing)
 
+3. For interacting and trying out on our demo website: 
+
+    [Demo Webpage](https://longchaoda.github.io/ShadedPlanning.github.io/)
