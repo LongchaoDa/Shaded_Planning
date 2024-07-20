@@ -23,3 +23,16 @@ Then, you should have the following adjustment:
 > Change the pkl_filename in the Dijkstra_shaded.py
 > Change the links_file_path and node_file_path in the end of Dijkstra_shaded.py
 > cd to the path of node.js, then run: node app.js
+
+
+# Data and demo video
+
+1. For dataset, please visit: 
+
+    [Dataset Access](https://www.dropbox.com/scl/fo/rvq0nazh7sd4qlx013l16/ANzGN1kQIvj88Mrpc7m6-w8?rlkey=w3xml0kv75hbt80gz8km75phd&dl=0)
+
+
+2. For video demonstration, please visit: 
+
+    [Demo Video](https://drive.google.com/drive/folders/1BvR0i0eImDb86HXiGS4hGRoFKa71DAnJ?usp=sharing)
+
