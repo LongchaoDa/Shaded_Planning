@@ -1,6 +1,20 @@
 # Shaded_planning
 
+
+
 ## This is the frontend of the project shaded planning
+
+This project intends to design a prototype of shade route planning with Satellite Image Segmentation. The purpose if to help users better plan their outdoor itineraries with most comfortable sunlight exposure situation.
+
+The project is deploy online: 
+
+http://18.191.152.144:9999/tutorial.html
+
+The overview of the designed pipline is shown here:
+
+![overview](./assets/overview.png)
+The detailed pipeline includes three components: Shade Ratio Derivation, Multi-
+layer Road Graph Construction, and Route Planning Interface.
 
 ## How to run the front-end:
 
