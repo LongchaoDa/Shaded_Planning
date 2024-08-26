@@ -173,6 +173,9 @@ def main(lengthFactor, shadeFactor, origin, destination, travelMode):
 # Testing
 
 # origin = (48.882210, 2.328871);
-# destination = (48.8823998,2.3236082)
+origin = (33.4275265,-111.9440773);
 
-# print(main(1, 0, origin, destination, 'WALKING'));
+# destination = (48.8823998,2.3236082)
+destination = (33.4156065,-111.9310708)
+
+print(main(1, 0, origin, destination, 'BICYCLING'));
