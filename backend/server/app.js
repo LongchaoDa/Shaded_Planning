@@ -25,7 +25,7 @@ app.post('/get-path', (req, res) => {
 
         try {
             // Parse the JSON output from the Python script
-            console.log(stdout)
+            // console.log(stdout)
             const pathsObject = JSON.parse(stdout);
             const response = Object.entries(pathsObject).map(([typeOfPath, data]) => ({
                 typeOfPath: typeOfPath.toLowerCase(), // Convert "Shortest" to "shortest", etc.
